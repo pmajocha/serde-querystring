@@ -169,10 +169,10 @@ mod de {
 
         pub(crate) fn into_iter(
             self,
-        ) -> impl Iterator<Item = (DecodedSlice<'a>, Option<RawSlice<'a>>)> {
+        ) -> impl Iterator<Item = (DecodedSlice<'a>, RawSlice<'a>)> {
             self.pairs
                 .into_iter()
-                .map(|(key, pair)| (DecodedSlice(key), pair.1.map(|v| RawSlice(v.0))))
+                .map(|(key, pair)| (DecodedSlice(key), pair.1.map(|v| RawSlice(v.0)).unwrap_or_default()))
         }
     }
 }

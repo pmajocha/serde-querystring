@@ -95,7 +95,7 @@ impl<'de> Value<'de> for DecodedSlice<'de> {
     }
 
     fn is_none(&self) -> bool {
-        self.0.is_empty()
+        false
     }
 }
 
@@ -157,7 +157,7 @@ impl<'de> Value<'de> for RawSlice<'de> {
     }
 
     fn is_none(&self) -> bool {
-        self.0.is_empty()
+        false
     }
 }
 

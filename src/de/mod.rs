@@ -11,7 +11,7 @@ pub(crate) mod __implementors {
     pub(crate) use super::traits::{IntoDeserializer, IntoRawSlices};
 }
 
-use crate::parsers::{BracketsQS, DelimiterQS, DuplicateQS, UrlEncodedQS};
+use crate::parsers::{DelimiterQS, DuplicateQS, UrlEncodedQS};
 
 pub(crate) struct QSDeserializer<I, T> {
     iter: I,
@@ -141,7 +141,9 @@ where
         }
         ParseMode::Brackets => {
             // A PHP like interpretation of querystrings
-            T::deserialize(QSDeserializer::new(BracketsQS::parse(input).into_iter()))
+            panic!("Support for brackets is not tested thus disabled on this branch. It was not researched why it fails. 
+                Uncomment assert in test_de_values to proceed with it and whole test_brackets.");
+            //T::deserialize(QSDeserializer::new(BracketsQS::parse(input).into_iter()))
         }
     }
 }
