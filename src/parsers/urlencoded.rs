@@ -97,7 +97,7 @@ impl<'a> Pair<'a> {
 /// assert_eq!(parser.keys(), vec![&Cow::Borrowed(b"key")]);
 /// assert_eq!(
 ///     parser.value(b"key"),
-///     Some(Some(Cow::Borrowed("value".as_bytes())))
+///     Some(Cow::Borrowed("value".as_bytes()))
 /// );
 /// ```
 pub struct UrlEncodedQS<'a> {
@@ -140,11 +140,13 @@ impl<'a> UrlEncodedQS<'a> {
     ///
     /// # Note
     /// Percent decoding the value is done on-the-fly **every time** this function is called.
-    pub fn value(&self, key: &'a [u8]) -> Option<Option<Cow<'a, [u8]>>> {
+    pub fn value(&self, key: &'a [u8]) -> Option<Cow<'a, [u8]>> {
         let mut scratch = Vec::new();
         self.pairs
             .get(key)
-            .map(|p| p.1.as_ref().map(|v| v.decode_to(&mut scratch).into_cow()))
+            .map(|p| p.1.as_ref()
+                .map(|v| v.decode_to(&mut scratch).into_cow())
+                .unwrap_or_default())
     }
 }
 
@@ -190,7 +192,7 @@ mod tests {
         assert_eq!(parser.keys(), vec![&Cow::Borrowed(b"key")]);
         assert_eq!(
             parser.value(b"key"),
-            Some(Some(Cow::Borrowed("value".as_bytes())))
+            Some(Cow::Borrowed("value".as_bytes()))
         );
     }
 
@@ -200,9 +202,9 @@ mod tests {
 
         let parser = UrlEncodedQS::parse(slice);
 
-        assert_eq!(parser.value(b"foo"), Some(Some("bar".as_bytes().into())));
-        assert_eq!(parser.value(b"foobar"), Some(Some("baz".as_bytes().into())));
-        assert_eq!(parser.value(b"qux"), Some(Some("box".as_bytes().into())));
+        assert_eq!(parser.value(b"foo"), Some("bar".as_bytes().into()));
+        assert_eq!(parser.value(b"foobar"), Some("baz".as_bytes().into()));
+        assert_eq!(parser.value(b"qux"), Some("box".as_bytes().into()));
     }
 
     #[test]
@@ -212,9 +214,9 @@ mod tests {
         let parser = UrlEncodedQS::parse(slice);
 
         assert_eq!(parser.value(b"foo3"), None);
-        assert_eq!(parser.value(b"foo2"), Some(None));
-        assert_eq!(parser.value(b"foo"), Some(None));
-        assert_eq!(parser.value(b"foobar"), Some(Some("".as_bytes().into())));
+        assert_eq!(parser.value(b"foo2"), Some("".as_bytes().into()));
+        assert_eq!(parser.value(b"foo"), Some("".as_bytes().into()));
+        assert_eq!(parser.value(b"foobar"), Some("".as_bytes().into()));
     }
 
     #[test]
@@ -223,6 +225,6 @@ mod tests {
 
         let parser = UrlEncodedQS::parse(slice);
 
-        assert_eq!(parser.value(b"foo"), Some(Some("".as_bytes().into())));
+        assert_eq!(parser.value(b"foo"), Some("".as_bytes().into()));
     }
 }
